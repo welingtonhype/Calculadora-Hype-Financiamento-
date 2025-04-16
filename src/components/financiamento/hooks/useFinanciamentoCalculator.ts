@@ -5,6 +5,7 @@ import { useFinanciamento } from '../core/FinanciamentoContext';
 import { FormStage } from '../core/FinanciamentoContext';
 import { ApartamentoVariacao } from '@/types/apartamento';
 import { formatCurrency } from '@/utils/formatters';
+import { logger } from '@/utils/logger';
 
 export function useFinanciamentoCalculator() {
   const { dispatch, rendaMensal, entrada, amortizationSystem } = useFinanciamento();
@@ -18,45 +19,40 @@ export function useFinanciamentoCalculator() {
 
   const calcularFinanciamento = useCallback((variacao: ApartamentoVariacao) => {
     try {
-      // Converte os valores de string (em centavos) para número em reais
+      // Validações de segurança
+      if (!variacao || !variacao.valor || variacao.valor <= 0) {
+        throw new Error('Valor do imóvel inválido');
+      }
+
+      const valorImovel = variacao.valor;
       const entradaValue = Number(entrada) / 100;
       const rendaMensalValue = Number(rendaMensal) / 100;
-      const valorImovel = variacao.valor;
 
-      // Validações básicas
-      if (!rendaMensalValue || rendaMensalValue <= 0) {
-        dispatch({ 
-          type: 'SET_ERROR', 
-          payload: "Por favor, informe sua renda mensal." 
-        });
-        return false;
+      // Validações de valores
+      if (isNaN(entradaValue) || entradaValue <= 0) {
+        throw new Error('Valor de entrada inválido');
       }
 
-      if (!entradaValue || entradaValue <= 0) {
-        dispatch({ 
-          type: 'SET_ERROR', 
-          payload: "Por favor, informe o valor da entrada." 
-        });
-        return false;
+      if (isNaN(rendaMensalValue) || rendaMensalValue <= 0) {
+        throw new Error('Renda mensal inválida');
       }
 
-      // Validação do percentual mínimo de entrada (20%)
+      // Validação de percentual mínimo de entrada (20%)
       const percentualEntrada = (entradaValue / valorImovel) * 100;
       if (percentualEntrada < 20) {
-        dispatch({ 
-          type: 'SET_ERROR', 
-          payload: `A entrada mínima deve ser de 20% do valor do imóvel (${formatCurrency(valorImovel * 0.2)}).` 
-        });
-        return false;
+        throw new Error(`A entrada mínima deve ser de 20% do valor do imóvel (${formatCurrency(valorImovel * 0.2)})`);
       }
 
-      // Validação do valor máximo financiável
+      // Validação de valor máximo de entrada
       if (entradaValue >= valorImovel) {
-        dispatch({ 
-          type: 'SET_ERROR', 
-          payload: "O valor da entrada não pode ser maior ou igual ao valor do imóvel." 
-        });
-        return false;
+        throw new Error('O valor da entrada não pode ser maior ou igual ao valor do imóvel');
+      }
+
+      // Validação de renda mínima (30% da parcela)
+      const valorFinanciado = valorImovel - entradaValue;
+      const parcelaEstimada = valorFinanciado * 0.01; // Estimativa conservadora
+      if (parcelaEstimada > rendaMensalValue * 0.3) {
+        throw new Error('Sua renda mensal não atende aos requisitos mínimos para este financiamento');
       }
 
       // Valida os parâmetros usando o serviço
@@ -89,10 +85,10 @@ export function useFinanciamentoCalculator() {
 
       return true;
     } catch (error) {
-      console.error('Erro no cálculo:', error);
+      logger.error('Erro no cálculo do financiamento', error as Error);
       dispatch({ 
         type: 'SET_ERROR', 
-        payload: "Ocorreu um erro ao calcular o financiamento. Por favor, verifique os valores e tente novamente." 
+        payload: 'Não foi possível calcular o financiamento. Por favor, verifique os dados e tente novamente.' 
       });
       return false;
     }

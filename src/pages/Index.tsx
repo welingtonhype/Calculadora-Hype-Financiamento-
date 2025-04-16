@@ -6,6 +6,7 @@ import FinanciamentoForm from '@/components/financiamento/FinanciamentoForm';
 import { Apartamento } from '@/types/apartamento';
 import { supabase } from '@/integrations/supabase/client';
 import { FinanciamentoProvider } from '@/components/financiamento/core/FinanciamentoContext';
+import { logger } from '@/utils/logger';
 
 const Index = () => {
   const [apartamentos, setApartamentos] = useState<Apartamento[]>([]);
@@ -65,68 +66,13 @@ const Index = () => {
         
         setApartamentos(transformedData);
       } catch (error) {
-        console.error('Erro ao buscar apartamentos:', error);
+        logger.error('Erro ao buscar apartamentos', error as Error);
         toast({
           title: "Erro ao carregar imóveis",
-          description: "Não foi possível carregar a lista de imóveis. Usando dados de demonstração.",
+          description: "Não foi possível carregar a lista de imóveis. Por favor, tente novamente mais tarde.",
           variant: "destructive"
         });
-        
-        // Fallback to demo data if Supabase query fails
-        const mockData: Apartamento[] = [
-          {
-            id: "1",
-            nome: "Hype Residence",
-            metragem: 85,
-            quartos: 2,
-            valor: 850000,
-            url: "https://example.com/apartamento/1",
-            bairro: "Jardins",
-            imagem: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
-          },
-          {
-            id: "2",
-            nome: "Hype Garden",
-            metragem: 120,
-            quartos: 3,
-            valor: 1250000,
-            url: "https://example.com/apartamento/2",
-            bairro: "Pinheiros",
-            imagem: "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
-          },
-          {
-            id: "3",
-            nome: "Hype Sky",
-            metragem: 65,
-            quartos: 1,
-            valor: 650000,
-            url: "https://example.com/apartamento/3",
-            bairro: "Vila Mariana",
-            imagem: "https://images.unsplash.com/photo-1560184897-67f4a3f9a7fa?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
-          },
-          {
-            id: "4",
-            nome: "Hype Premium",
-            metragem: 150,
-            quartos: 4,
-            valor: 1800000,
-            url: "https://example.com/apartamento/4",
-            bairro: "Moema",
-            imagem: "https://images.unsplash.com/photo-1517541866997-ea18e32ea9e9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
-          },
-          {
-            id: "5",
-            nome: "Hype Compact",
-            metragem: 45,
-            quartos: 1,
-            valor: 450000,
-            url: "https://example.com/apartamento/5",
-            bairro: "Consolação",
-            imagem: "https://images.unsplash.com/photo-1599427303058-f04cbcf4756f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
-          }
-        ];
-        
-        setApartamentos(mockData);
+        setApartamentos([]);
       } finally {
         setIsLoading(false);
       }

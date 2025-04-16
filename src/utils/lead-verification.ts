@@ -1,4 +1,5 @@
 import { Apartamento } from '@/types/apartamento';
+import { logger } from './logger';
 
 interface LeadData {
   email: string;
@@ -10,7 +11,7 @@ const LEAD_STORAGE_KEY = '@hype/lead-data';
 const LEAD_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000; // 7 dias em milissegundos
 
 export const LeadVerificationService = {
-  saveLead(email: string, apartamento: Apartamento) {
+  saveLead: async (email: string, apartamento: Apartamento) => {
     const leadData: LeadData = {
       email,
       apartamentoId: apartamento.id,
@@ -19,19 +20,20 @@ export const LeadVerificationService = {
 
     try {
       // Recupera leads existentes ou inicia array vazio
-      const existingLeads = this._getStoredLeads();
+      const existingLeads = await this.getLeads();
       existingLeads.push(leadData);
       
       // Salva no localStorage
       localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify(existingLeads));
     } catch (error) {
-      console.error('Erro ao salvar lead:', error);
+      logger.error('Erro ao salvar lead', error as Error);
+      throw error;
     }
   },
 
-  hasRecentLead(apartamentoId: string): boolean {
+  hasRecentLead: async (apartamentoId: string): Promise<boolean> => {
     try {
-      const leads = this._getStoredLeads();
+      const leads = await this.getLeads();
       const now = Date.now();
 
       // Verifica se existe algum lead recente para este apartamento
@@ -40,13 +42,13 @@ export const LeadVerificationService = {
         (now - lead.timestamp) < LEAD_EXPIRATION_TIME
       );
     } catch (error) {
-      console.error('Erro ao verificar lead:', error);
+      logger.error('Erro ao verificar lead', error as Error);
       return false;
     }
   },
 
   // Método interno com prefixo _ para indicar que é privado
-  _getStoredLeads(): LeadData[] {
+  getLeads: async (): Promise<LeadData[]> => {
     try {
       const storedData = localStorage.getItem(LEAD_STORAGE_KEY);
       if (!storedData) return [];
@@ -66,8 +68,8 @@ export const LeadVerificationService = {
 
       return validLeads;
     } catch (error) {
-      console.error('Erro ao recuperar leads:', error);
-      return [];
+      logger.error('Erro ao recuperar leads', error as Error);
+      throw error;
     }
   }
 }; 
