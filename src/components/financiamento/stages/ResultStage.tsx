@@ -25,20 +25,20 @@ const ResultStage = ({
   if (!resultado) return null;
 
   return (
-    <div className="w-full max-w-2xl mx-auto animate-fade-in space-y-10">
-      <div className="pt-4 pb-8 md:pt-6 md:pb-10 flex justify-center">
+    <div className="w-full max-w-2xl mx-auto animate-fade-in">
+      <div className="mb-16 md:mb-20">
         <Stepper steps={stepperSteps} currentStep={currentStep} className="w-full" />
       </div>
       
-      <div className="my-8 md:my-10">
+      <div className="mb-8 md:mb-10">
         <ApartamentoCard 
           apartamento={apartamento}
           showSimulateButton={false}
-          className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden"
+          className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden w-full"
         />
       </div>
       
-      <div className="my-8 md:my-10">
+      <div className="mb-8 md:mb-10">
         <FinanciamentoResultado 
           resultado={resultado}
           valorImovel={apartamento.valor}
@@ -47,11 +47,11 @@ const ResultStage = ({
         />
       </div>
       
-      <div className="w-full mx-auto pb-8 pt-4">
+      <div className="w-full">
         <Button 
           onClick={onReset}
           variant="outline"
-          className="w-full flex items-center gap-2 py-6"
+          className="w-full flex items-center gap-2 py-6 text-base font-medium"
         >
           <ArrowLeft className="h-4 w-4" />
           Voltar para lista de imóveis

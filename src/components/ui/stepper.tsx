@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -18,7 +17,7 @@ const Stepper = ({ steps, currentStep, className }: StepperProps) => {
             <div className="relative flex flex-col items-center">
               <div
                 className={cn(
-                  "flex items-center justify-center rounded-full w-10 h-10 text-sm font-medium",
+                  "flex items-center justify-center rounded-full w-8 h-8 md:w-10 md:h-10 text-xs md:text-sm font-medium",
                   index + 1 === currentStep
                     ? "bg-[#00C896] text-white font-bold" // Active
                     : index + 1 < currentStep
@@ -27,15 +26,15 @@ const Stepper = ({ steps, currentStep, className }: StepperProps) => {
                 )}
               >
                 {index + 1 < currentStep ? (
-                  <Check className="h-4 w-4" />
+                  <Check className="h-3.5 w-3.5 md:h-4 md:w-4" />
                 ) : (
                   index + 1
                 )}
               </div>
               <span
                 className={cn(
-                  "absolute top-12 text-xs md:text-sm text-center max-w-[80px] md:max-w-none",
-                  "whitespace-normal md:whitespace-nowrap mt-1.5",
+                  "absolute top-10 md:top-12 text-[10px] md:text-xs text-center max-w-[70px] md:max-w-[80px] lg:max-w-none",
+                  "whitespace-normal lg:whitespace-nowrap mt-1",
                   index + 1 === currentStep
                     ? "text-[#00C896] font-semibold" // Active
                     : index + 1 < currentStep
@@ -49,7 +48,7 @@ const Stepper = ({ steps, currentStep, className }: StepperProps) => {
             {index < steps.length - 1 && (
               <div 
                 className={cn(
-                  "h-1 flex-1 mx-2 md:mx-4",
+                  "h-0.5 md:h-1 flex-1 mx-1.5 md:mx-2 lg:mx-4",
                   index + 1 < currentStep ? "bg-[#00C896]/60" : "bg-gray-200"
                 )}
               />
