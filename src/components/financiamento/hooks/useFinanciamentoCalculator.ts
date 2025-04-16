@@ -61,11 +61,6 @@ export function useFinanciamentoCalculator() {
       dispatch({ type: 'SET_STAGE', payload: FormStage.LEAD_FORM });
       dispatch({ type: 'SET_ERROR', payload: null });
 
-      toast({
-        title: "Dados recebidos com sucesso!",
-        description: "Preencha seus dados para ver os resultados da simulação.",
-      });
-
       return true;
     } catch (error) {
       console.error('Erro no cálculo:', error);
@@ -75,7 +70,7 @@ export function useFinanciamentoCalculator() {
       });
       return false;
     }
-  }, [amortizationSystem, entrada, rendaMensal, dispatch, toast]);
+  }, [amortizationSystem, entrada, rendaMensal, dispatch]);
 
   return {
     handleNumberInput,

@@ -14,9 +14,10 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useToast } from '@/components/ui/use-toast';
-import { User, Mail, Phone, Send, Lock } from 'lucide-react';
+import { User, Mail, Phone, Send, Lock, PhoneCall } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Apartamento } from '@/types/apartamento';
+import { useFinanciamento } from '@/components/financiamento/core/FinanciamentoContext';
 
 interface LeadFormProps {
   apartamento: Apartamento;
@@ -58,6 +59,7 @@ const LeadForm = ({
 }: LeadFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { dispatch } = useFinanciamento();
 
   const form = useForm<LeadFormValues>({
     resolver: zodResolver(leadFormSchema),
@@ -90,7 +92,7 @@ const LeadForm = ({
       // Format phone number for consistency in the database
       const formattedPhone = data.telefone.replace(/\D/g, '');
       
-      // Preparar os dados do lead com os novos campos
+      // Preparar os dados do lead
       const leadData = {
         nome: data.nome,
         email: data.email,
@@ -98,31 +100,30 @@ const LeadForm = ({
         apartamento_simulado: apartamento.nome,
         data: new Date().toISOString(),
         consentimento: data.consent,
-        // Novos campos da simulação
         renda_mensal: rendaMensal ? parseFloat(rendaMensal.replace(/\D/g, '')) / 100 : null,
         valor_entrada: valorEntrada ? parseFloat(valorEntrada.replace(/\D/g, '')) / 100 : null,
         sistema_amortizacao: sistemaAmortizacao || null,
         valor_imovel: apartamento.valor,
         valor_financiado: apartamento.valor - (valorEntrada ? parseFloat(valorEntrada.replace(/\D/g, '')) / 100 : 0),
         valor_parcela: valorParcela || null,
-        prazo_meses: prazoMeses || 360, // Valor padrão de 30 anos
-        taxa_juros: taxaJuros || 9, // Valor padrão de 9% ao ano
+        prazo_meses: prazoMeses || 360,
+        taxa_juros: taxaJuros || 9,
         apartamento_id: apartamento.id,
         apartamento_nome: apartamento.nome,
         apartamento_metragem: apartamento.metragem,
         apartamento_quartos: apartamento.quartos,
       };
       
-      console.log('Dados do lead a serem salvos:', leadData); // Log para debug
-      
       const { error } = await supabase
         .from('leads')
         .insert(leadData);
       
       if (error) {
-        console.error('Erro ao salvar lead:', error); // Log para debug
         throw error;
       }
+      
+      // Marca que o formulário foi preenchido
+      dispatch({ type: 'SET_FORM_PREENCHIDO', payload: true });
       
       toast({
         title: 'Dados enviados com sucesso!',
@@ -145,19 +146,18 @@ const LeadForm = ({
   };
 
   return (
-    <div className="bg-white rounded-xl p-6">
-      {!showConsentCheckbox && (
-        <h3 className="text-xl font-semibold mb-6 text-hype-black flex items-center gap-2">
-          <User className="h-5 w-5 text-hype-green" />
-          Tenho interesse neste imóvel
-        </h3>
-      )}
-      
-      {showConsentCheckbox && (
-        <h3 className="text-xl font-semibold mb-6 text-hype-black text-center">
-          📊 Estamos quase lá! Preencha seus dados e veja o plano completo do seu financiamento.
-        </h3>
-      )}
+    <div className="bg-white p-6 md:p-10 rounded-xl shadow-md">
+      <div className="text-left md:text-center mb-6 md:mb-8">
+        <div className="space-y-1.5 md:space-y-2">
+          <div className="text-xl md:text-2xl font-semibold text-hype-black flex items-center justify-start md:justify-center gap-2">
+            <PhoneCall className="w-5 md:w-6 h-5 md:h-6 text-hype-green" aria-hidden="true" />
+            Fale com um especialista
+          </div>
+          <div className="text-sm text-gray-500">
+            Preencha o formulário abaixo para receber mais informações
+          </div>
+        </div>
+      </div>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -258,13 +258,13 @@ const LeadForm = ({
           <div className="pt-4">
             <Button 
               type="submit" 
-              className="w-full bg-hype-green hover:bg-hype-green/90 text-white gap-2 py-6 text-base font-semibold"
+              className="w-full bg-hype-green hover:bg-hype-green/90 text-white gap-1.5 md:gap-2 py-4 md:py-6 text-sm md:text-base font-semibold"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
                 <>
                   <span className="animate-spin">
-                    <svg className="h-5 w-5" viewBox="0 0 24 24">
+                    <svg className="h-4 md:h-5 w-4 md:w-5" viewBox="0 0 24 24">
                       <circle 
                         className="opacity-25" 
                         cx="12" 
@@ -285,7 +285,7 @@ const LeadForm = ({
                 </>
               ) : (
                 <>
-                  <Send className="h-5 w-5" />
+                  <Send className="h-4 md:h-5 w-4 md:w-5" />
                   <span>{ctaButtonText}</span>
                 </>
               )}

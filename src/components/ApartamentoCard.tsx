@@ -99,11 +99,12 @@ const ApartamentoCard = ({
                 onSelect();
               }}
               className="
-                w-full px-4 py-3 
+                w-full px-3 md:px-4 py-2.5 md:py-3 
                 rounded-lg 
                 bg-hype-green text-white 
                 hover:bg-hype-green-dark 
                 font-medium 
+                text-sm md:text-base
                 transition-colors
               "
             >

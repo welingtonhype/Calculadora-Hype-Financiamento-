@@ -115,15 +115,14 @@ const Index = () => {
       <div className="min-h-screen bg-[#f9f9fa] flex flex-col">
         <Header />
         
-        <main className="flex-1 mt-12 pt-12 container mx-auto max-w-[1200px] px-6 md:px-8">
-          <div className="max-w-2xl mx-auto">
-            <div className="mb-10 text-left">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+        <main className="flex-1 mt-8 md:mt-12 pt-8 md:pt-12 container mx-auto max-w-[1200px] px-4 md:px-8">
+          <div className="w-full max-w-2xl mx-auto space-y-6 px-4 md:px-0">
+            <div className="text-left space-y-1.5 md:space-y-2">
+              <h1 className="text-2xl md:text-3xl font-semibold text-hype-black">
                 Calcule seu Financiamento Imobiliário
-              </h2>
-              <p className="text-gray-500 max-w-xl mt-2 text-base">
-                Simule o financiamento do seu imóvel Hype com base nos sistemas PRICE e SAC.
-                Escolha um dos nossos empreendimentos e calcule as condições ideais para você.
+              </h1>
+              <p className="text-sm text-gray-500">
+                Simule o financiamento do seu imóvel Hype com base nos sistemas PRICE e SAC. Escolha um dos nossos empreendimentos e calcule as condições ideais para você.
               </p>
             </div>
             
@@ -139,18 +138,26 @@ const Index = () => {
                 </p>
               </div>
             ) : (
-              <FinanciamentoForm 
-                apartamentos={apartamentos}
-                isLoading={isLoading}
-              />
+              <div className="mb-16">
+                <FinanciamentoForm 
+                  apartamentos={apartamentos}
+                  isLoading={isLoading}
+                />
+              </div>
             )}
           </div>
         </main>
         
-        <footer className="mt-auto py-6 bg-[#020817] border-t border-gray-800">
-          <div className="container mx-auto px-4 text-center">
-            <p className="text-[11px] md:text-sm text-gray-400">© {new Date().getFullYear()} Simulador Hype – Financiamento Imobiliário</p>
-            <p className="mt-1 text-[11px] md:text-sm text-gray-400">Desenvolvido com ❤️ pela equipe Hype</p>
+        <div className="mt-16 md:mt-24"></div>
+        
+        <footer className="mt-auto py-4 md:py-6 bg-[#020817]">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col items-center space-y-1">
+              <p className="text-[11px] md:text-xs text-gray-400">© {new Date().getFullYear()} Simulador Hype – Financiamento Imobiliário</p>
+              <p className="text-[11px] md:text-xs text-gray-400 flex items-center gap-1">
+                Desenvolvido com <span className="text-red-500">❤️</span> pela equipe Hype
+              </p>
+            </div>
           </div>
         </footer>
       </div>

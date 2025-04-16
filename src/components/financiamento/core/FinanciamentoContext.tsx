@@ -20,6 +20,7 @@ interface FinanciamentoState {
   amortizationSystem: SistemaAmortizacao;
   resultado: ResultadoFinanciamento | null;
   error: string | null;
+  formPreenchido: boolean;
 }
 
 // Tipos de ações
@@ -31,6 +32,7 @@ type FinanciamentoAction =
   | { type: 'SET_AMORTIZATION_SYSTEM'; payload: SistemaAmortizacao }
   | { type: 'SET_RESULTADO'; payload: ResultadoFinanciamento }
   | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'SET_FORM_PREENCHIDO'; payload: boolean }
   | { type: 'RESET' };
 
 // Estado inicial
@@ -41,7 +43,8 @@ const initialState: FinanciamentoState = {
   formStage: FormStage.SELECT_PROPERTY,
   amortizationSystem: 'SAC',
   resultado: null,
-  error: null
+  error: null,
+  formPreenchido: false
 };
 
 // Reducer
@@ -65,8 +68,10 @@ function financiamentoReducer(state: FinanciamentoState, action: FinanciamentoAc
       return { ...state, resultado: action.payload };
     case 'SET_ERROR':
       return { ...state, error: action.payload };
+    case 'SET_FORM_PREENCHIDO':
+      return { ...state, formPreenchido: action.payload };
     case 'RESET':
-      return initialState;
+      return { ...initialState, formPreenchido: state.formPreenchido };
     default:
       return state;
   }
@@ -85,7 +90,15 @@ interface FinanciamentoProviderProps {
 }
 
 export function FinanciamentoProvider({ children }: FinanciamentoProviderProps) {
-  const [state, dispatch] = useReducer(financiamentoReducer, initialState);
+  const [state, dispatch] = useReducer(financiamentoReducer, {
+    ...initialState,
+    formPreenchido: localStorage.getItem('formPreenchido') === 'true'
+  });
+
+  // Salva no localStorage quando o estado muda
+  React.useEffect(() => {
+    localStorage.setItem('formPreenchido', state.formPreenchido.toString());
+  }, [state.formPreenchido]);
 
   return (
     <FinanciamentoContext.Provider value={{ ...state, dispatch }}>

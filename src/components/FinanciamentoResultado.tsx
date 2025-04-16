@@ -26,87 +26,111 @@ const FinanciamentoResultado = ({
     capacidadePagamento,
     dentroCapacidade,
     sistema,
-    percentualEntrada
+    percentualEntrada,
+    taxaJurosMensal,
+    taxaJurosAnual
   } = resultado;
 
   const valorFinanciado = valorImovel - entrada;
 
   return (
     <>
-      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-card border border-gray-100 p-8 flex flex-col gap-6 items-start mt-2 md:mt-3">
-        {/* Sistema de Amortização */}
-        <div className="w-full mb-2 text-left">
-          <p className="text-hype-gray-dark text-xs font-medium mb-1">Sistema de Amortização</p>
-          <h2 className="text-xl font-bold text-hype-black mb-1">
-            {sistema === 'SAC' ? 'Parcelas decrescentes' : 'Parcelas fixas'} <span className="font-normal text-base">({sistema})</span>
-          </h2>
-          <p className="text-hype-gray-dark text-sm">
-            {sistema === 'SAC'
-              ? <>Suas parcelas vão diminuindo com o tempo. O valor mostrado é da <span className="font-semibold">primeira parcela</span>.</>
-              : <>Suas parcelas serão fixas durante todo o financiamento.</>}
-          </p>
-        </div>
-
-        <hr className="w-full border-hype-gray-light my-2" />
-
-        {/* Valor da Parcela */}
-        <div className="w-full mb-2">
-          <p className="text-hype-gray-dark text-xs font-medium mb-1">Valor da Parcela</p>
-          <span className="text-4xl font-extrabold text-hype-green block leading-tight">{formatCurrency(primeiraParcela)}</span>
-          <p className="text-hype-gray-dark text-base">(primeira parcela)</p>
-          {sistema === 'SAC' && (
-            <p className="text-hype-gray-dark text-xs mt-2">Última parcela: <span className="font-semibold">{formatCurrency(ultimaParcela)}</span></p>
-          )}
-          {!dentroCapacidade && (
-            <div className="bg-red-100 text-red-700 rounded-full text-xs px-3 py-1 mt-3 flex items-center gap-1">
-              <span aria-hidden="true">⚠</span> Acima da sua capacidade ({formatCurrency(capacidadePagamento)})
+      <div className="bg-white p-4 md:p-10 rounded-xl shadow-md">
+        <div className="text-left md:text-center mb-4 md:mb-8">
+          <div className="space-y-1.5 md:space-y-2">
+            <div className="text-lg md:text-2xl font-semibold text-hype-black">
+              Resultado da simulação
             </div>
-          )}
+            <div className="text-sm text-gray-500">
+              Confira abaixo os detalhes do seu financiamento
+            </div>
+          </div>
         </div>
 
-        <hr className="w-full border-hype-gray-light my-2" />
+        <div className="bg-white rounded-xl shadow-card border border-gray-100 p-4 md:p-8 flex flex-col gap-4 md:gap-6 items-start">
+          {/* Sistema de Amortização */}
+          <div className="w-full text-left">
+            <p className="text-hype-gray-dark text-xs font-medium mb-1">Sistema de Amortização</p>
+            <h2 className="text-lg md:text-xl font-bold text-hype-black mb-1">
+              {sistema === 'SAC' ? 'Parcelas decrescentes' : 'Parcelas fixas'} <span className="font-normal text-base">({sistema})</span>
+            </h2>
+            <p className="text-hype-gray-dark text-[11px] md:text-sm">
+              {sistema === 'SAC'
+                ? <>Suas parcelas vão diminuindo com o tempo. O valor mostrado é da <span className="font-semibold">primeira parcela</span>.</>
+                : <>Suas parcelas serão fixas durante todo o financiamento.</>}
+            </p>
+          </div>
 
-        {/* Dados financeiros */}
-        <div className="w-full grid grid-cols-2 gap-y-2 gap-x-4 text-left">
-          <div>
-            <p className="text-xs text-hype-gray-dark uppercase font-medium">Valor do imóvel</p>
-            <p className="text-lg font-bold text-hype-black">{formatCurrency(valorImovel)}</p>
+          <hr className="w-full border-hype-gray-light" />
+
+          {/* Valor da Parcela */}
+          <div className="w-full">
+            <p className="text-hype-gray-dark text-xs font-medium mb-2 md:mb-3">Valor da Parcela</p>
+            <div className="space-y-2">
+              <div>
+                <span className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-hype-green block leading-none tracking-tight">{formatCurrency(primeiraParcela)}</span>
+                <p className="text-sm text-hype-gray-dark mt-2">(primeira parcela)</p>
+              </div>
+              {sistema === 'SAC' && (
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-sm text-hype-gray-dark">Última parcela:</span>
+                  <span className="text-base md:text-lg font-semibold text-hype-black">{formatCurrency(ultimaParcela)}</span>
+                </div>
+              )}
+            </div>
           </div>
-          <div>
-            <p className="text-xs text-hype-gray-dark uppercase font-medium">Entrada</p>
-            <p className="text-lg font-bold text-hype-black">{formatCurrency(entrada)} <span className="text-xs text-hype-gray-dark font-normal">({percentualEntrada.toFixed(1)}%)</span></p>
-          </div>
-          <div>
-            <p className="text-xs text-hype-gray-dark uppercase font-medium">Financiado</p>
-            <p className="text-lg font-bold text-hype-black">{formatCurrency(valorFinanciado)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-hype-gray-dark uppercase font-medium">Total de juros</p>
-            <p className="text-lg font-bold text-hype-black">{formatCurrency(totalJuros)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-hype-gray-dark uppercase font-medium">Total pago</p>
-            <p className="text-lg font-bold text-hype-black">{formatCurrency(totalPago)}</p>
+
+          <hr className="w-full border-hype-gray-light" />
+
+          {/* Dados financeiros */}
+          <div className="w-full grid grid-cols-2 gap-3 md:gap-2 text-left">
+            <div>
+              <p className="text-[10px] md:text-xs text-hype-gray-dark uppercase font-medium mb-0.5 md:mb-1">Valor do imóvel</p>
+              <p className="text-sm md:text-xl font-bold text-hype-black">{formatCurrency(valorImovel)}</p>
+            </div>
+            <div>
+              <p className="text-[10px] md:text-xs text-hype-gray-dark uppercase font-medium mb-0.5 md:mb-1">Entrada</p>
+              <p className="text-sm md:text-xl font-bold text-hype-black flex items-baseline gap-1">
+                {formatCurrency(entrada)}
+                <span className="text-[10px] md:text-sm text-hype-green font-semibold">({percentualEntrada.toFixed(1)}%)</span>
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px] md:text-xs text-hype-gray-dark uppercase font-medium mb-0.5 md:mb-1">Financiado</p>
+              <p className="text-sm md:text-xl font-bold text-hype-black">{formatCurrency(valorFinanciado)}</p>
+            </div>
+            <div>
+              <p className="text-[10px] md:text-xs text-hype-gray-dark uppercase font-medium mb-0.5 md:mb-1">Taxa de juros</p>
+              <div className="flex flex-col">
+                <p className="text-sm md:text-xl font-bold text-hype-black">{taxaJurosAnual.toFixed(2)}% a.a.</p>
+                <p className="text-[10px] md:text-sm text-hype-gray-dark">{taxaJurosMensal.toFixed(2)}% a.m.</p>
+              </div>
+            </div>
+            <div className="col-span-2">
+              <p className="text-[10px] md:text-xs text-hype-gray-dark uppercase font-medium mb-0.5 md:mb-1">Total pago</p>
+              <p className="text-base md:text-2xl font-bold text-hype-black">{formatCurrency(totalPago)}</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Botão CTA */}
-      <div className="mt-8 w-full max-w-2xl mx-auto">
+      <div className="px-4 md:px-0 mt-6 md:mt-8">
         <button
-          className="w-full bg-hype-green text-white text-base font-semibold px-8 py-5 rounded-lg shadow-card hover:bg-hype-green-dark transition-all flex items-center justify-center gap-2"
+          className="w-full bg-hype-green text-white text-sm md:text-base font-semibold px-4 md:px-8 py-4 md:py-5 rounded-lg hover:bg-hype-green/90 transition-all flex items-center justify-center gap-1.5 md:gap-2"
           onClick={onQueroEsteImovel}
           aria-label="Falar com um especialista"
         >
-          <PhoneCall className="w-5 h-5" aria-hidden="true" />
+          <PhoneCall className="w-4 md:w-5 h-4 md:h-5" aria-hidden="true" />
           Falar com um especialista
         </button>
-      </div>
 
-      {/* Rodapé */}
-      <p className="text-xs text-hype-gray-dark text-left max-w-2xl mx-auto mt-6 italic">
-        Esta simulação é apenas um exemplo para fins informativos. As condições reais podem variar conforme análise de crédito e política da instituição financeira.
-      </p>
+        {/* Rodapé */}
+        <p className="text-sm text-hype-gray-dark mt-4 md:mt-6">
+          Conte com a Hype para encontrar o imóvel dos seus sonhos.
+          <span className="hidden md:inline"> Nossa equipe está pronta para te ajudar em cada etapa.</span>
+        </p>
+      </div>
     </>
   );
 };
