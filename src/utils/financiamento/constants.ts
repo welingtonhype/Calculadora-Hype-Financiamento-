@@ -1,6 +1,5 @@
 export const PRAZO_PADRAO = 420; // 35 anos
-export const PERCENTUAL_ENTRADA_MINIMO = 0.05; // 5%
-export const PERCENTUAL_RENDA_MAXIMO = 0.30; // 30%
+export const PERCENTUAL_ENTRADA_MINIMO = 0.20; // 20%
 export const RENDA_MINIMA = 1000; // R$ 1.000,00
 
 export const TAXAS_JUROS = {

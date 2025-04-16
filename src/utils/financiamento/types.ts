@@ -24,6 +24,4 @@ export interface ResultadoFinanciamento {
   totalPago: number;
   sistema: SistemaAmortizacao;
   indexador: Indexador;
-  capacidadePagamento: number;
-  dentroCapacidade: boolean;
 } 

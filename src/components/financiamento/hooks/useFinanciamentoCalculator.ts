@@ -5,7 +5,7 @@ import { useFinanciamento } from '../core/FinanciamentoContext';
 import { FormStage } from '../core/FinanciamentoContext';
 import { ApartamentoVariacao } from '@/types/apartamento';
 import { formatCurrency } from '@/utils/formatters';
-import { logger } from '@/utils/logger';
+import { PERCENTUAL_ENTRADA_MINIMO, RENDA_MINIMA } from '@/utils/financiamento/constants';
 
 export function useFinanciamentoCalculator() {
   const { dispatch, rendaMensal, entrada, amortizationSystem } = useFinanciamento();
@@ -19,40 +19,54 @@ export function useFinanciamentoCalculator() {
 
   const calcularFinanciamento = useCallback((variacao: ApartamentoVariacao) => {
     try {
-      // Validações de segurança
-      if (!variacao || !variacao.valor || variacao.valor <= 0) {
-        throw new Error('Valor do imóvel inválido');
-      }
-
-      const valorImovel = variacao.valor;
+      // Converte os valores de string (em centavos) para número em reais
       const entradaValue = Number(entrada) / 100;
       const rendaMensalValue = Number(rendaMensal) / 100;
+      const valorImovel = variacao.valor;
 
-      // Validações de valores
-      if (isNaN(entradaValue) || entradaValue <= 0) {
-        throw new Error('Valor de entrada inválido');
+      // Validações básicas
+      if (!rendaMensalValue || rendaMensalValue <= 0) {
+        dispatch({ 
+          type: 'SET_ERROR', 
+          payload: "Por favor, informe sua renda mensal." 
+        });
+        return false;
       }
 
-      if (isNaN(rendaMensalValue) || rendaMensalValue <= 0) {
-        throw new Error('Renda mensal inválida');
+      if (!entradaValue || entradaValue <= 0) {
+        dispatch({ 
+          type: 'SET_ERROR', 
+          payload: "Por favor, informe o valor da entrada." 
+        });
+        return false;
       }
 
-      // Validação de percentual mínimo de entrada (20%)
+      // Validação do percentual mínimo de entrada
       const percentualEntrada = (entradaValue / valorImovel) * 100;
-      if (percentualEntrada < 20) {
-        throw new Error(`A entrada mínima deve ser de 20% do valor do imóvel (${formatCurrency(valorImovel * 0.2)})`);
+      if (percentualEntrada < PERCENTUAL_ENTRADA_MINIMO * 100) {
+        dispatch({ 
+          type: 'SET_ERROR', 
+          payload: `A entrada mínima deve ser de ${PERCENTUAL_ENTRADA_MINIMO * 100}% do valor do imóvel (${formatCurrency(valorImovel * PERCENTUAL_ENTRADA_MINIMO)}).` 
+        });
+        return false;
       }
 
-      // Validação de valor máximo de entrada
+      // Validação do valor máximo financiável
       if (entradaValue >= valorImovel) {
-        throw new Error('O valor da entrada não pode ser maior ou igual ao valor do imóvel');
+        dispatch({ 
+          type: 'SET_ERROR', 
+          payload: "O valor da entrada não pode ser maior ou igual ao valor do imóvel." 
+        });
+        return false;
       }
 
-      // Validação de renda mínima (30% da parcela)
-      const valorFinanciado = valorImovel - entradaValue;
-      const parcelaEstimada = valorFinanciado * 0.01; // Estimativa conservadora
-      if (parcelaEstimada > rendaMensalValue * 0.3) {
-        throw new Error('Sua renda mensal não atende aos requisitos mínimos para este financiamento');
+      // Validação da renda mínima
+      if (rendaMensalValue < RENDA_MINIMA) {
+        dispatch({ 
+          type: 'SET_ERROR', 
+          payload: `A renda mensal mínima é de ${formatCurrency(RENDA_MINIMA)}.` 
+        });
+        return false;
       }
 
       // Valida os parâmetros usando o serviço
@@ -85,10 +99,10 @@ export function useFinanciamentoCalculator() {
 
       return true;
     } catch (error) {
-      logger.error('Erro no cálculo do financiamento', error as Error);
+      console.error('Erro no cálculo:', error);
       dispatch({ 
         type: 'SET_ERROR', 
-        payload: 'Não foi possível calcular o financiamento. Por favor, verifique os dados e tente novamente.' 
+        payload: "Ocorreu um erro ao calcular o financiamento. Por favor, verifique os valores e tente novamente." 
       });
       return false;
     }

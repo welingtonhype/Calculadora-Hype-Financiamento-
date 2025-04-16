@@ -18,7 +18,6 @@ import { User, Mail, Phone, Send, Lock, PhoneCall } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Apartamento } from '@/types/apartamento';
 import { useFinanciamento } from '@/components/financiamento/core/FinanciamentoContext';
-import { logger } from '@/utils/logger';
 
 interface LeadFormProps {
   apartamento: Apartamento;
@@ -89,54 +88,57 @@ const LeadForm = ({
   const onSubmit = async (data: LeadFormValues) => {
     try {
       setIsSubmitting(true);
-
-      // Sanitização dos dados
-      const sanitizedData = {
-        ...data,
-        nome: data.nome.trim(),
-        email: data.email.toLowerCase().trim(),
-        telefone: data.telefone.replace(/\D/g, '') // Remove caracteres não numéricos
+      
+      // Format phone number for consistency in the database
+      const formattedPhone = data.telefone.replace(/\D/g, '');
+      
+      // Preparar os dados do lead
+      const leadData = {
+        nome: data.nome,
+        email: data.email,
+        telefone: formattedPhone,
+        apartamento_simulado: apartamento.nome,
+        data: new Date().toISOString(),
+        consentimento: data.consent,
+        renda_mensal: rendaMensal ? parseFloat(rendaMensal.replace(/\D/g, '')) / 100 : null,
+        valor_entrada: valorEntrada ? parseFloat(valorEntrada.replace(/\D/g, '')) / 100 : null,
+        sistema_amortizacao: sistemaAmortizacao || null,
+        valor_imovel: apartamento.valor,
+        valor_financiado: apartamento.valor - (valorEntrada ? parseFloat(valorEntrada.replace(/\D/g, '')) / 100 : 0),
+        valor_parcela: valorParcela || null,
+        prazo_meses: prazoMeses || 360,
+        taxa_juros: taxaJuros || 9,
+        apartamento_id: apartamento.id,
+        apartamento_nome: apartamento.nome,
+        apartamento_metragem: apartamento.metragem,
+        apartamento_quartos: apartamento.quartos,
       };
-
-      // Validação adicional de segurança
-      if (!sanitizedData.nome || !sanitizedData.email || !sanitizedData.telefone) {
-        throw new Error('Dados inválidos');
-      }
-
-      // Validação de email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(sanitizedData.email)) {
-        throw new Error('Email inválido');
-      }
-
-      // Validação de telefone
-      if (sanitizedData.telefone.length < 10 || sanitizedData.telefone.length > 11) {
-        throw new Error('Telefone inválido');
-      }
-
+      
       const { error } = await supabase
         .from('leads')
-        .insert({
-          ...sanitizedData,
-          apartamento_id: apartamento.id,
-          created_at: new Date().toISOString()
-        });
-
-      if (error) throw error;
-
+        .insert(leadData);
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Marca que o formulário foi preenchido
+      dispatch({ type: 'SET_FORM_PREENCHIDO', payload: true });
+      
       toast({
-        title: "Sucesso!",
-        description: "Seus dados foram enviados com sucesso.",
-        variant: "default"
+        title: 'Dados enviados com sucesso!',
+        description: 'Agora você pode ver a simulação detalhada.',
+        variant: 'default',
       });
-
+      
+      form.reset();
       onSubmitSuccess();
     } catch (error) {
-      logger.error('Erro ao enviar lead', error as Error);
+      console.error('Erro ao enviar lead:', error);
       toast({
-        title: "Erro ao enviar dados",
-        description: "Não foi possível enviar seus dados. Por favor, tente novamente.",
-        variant: "destructive"
+        title: 'Erro ao enviar seus dados',
+        description: 'Por favor, tente novamente mais tarde.',
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);

@@ -2,8 +2,7 @@ import { ParametrosFinanciamento, ResultadoFinanciamento, Indexador } from './ty
 import { AmortizacaoFactory } from './AmortizacaoFactory';
 import { 
   PRAZO_PADRAO, 
-  PERCENTUAL_ENTRADA_MINIMO, 
-  PERCENTUAL_RENDA_MAXIMO,
+  PERCENTUAL_ENTRADA_MINIMO,
   RENDA_MINIMA,
   TAXAS_JUROS 
 } from './constants';
@@ -51,14 +50,10 @@ export class FinanciamentoService {
     const percentualEntrada = (valorEntrada / valorImovel) * 100;
     const taxaJurosAnual = TAXAS_JUROS[indexador][sistema];
     const taxaJurosMensal = taxaJurosAnual / 12 / 100;
-    const capacidadePagamento = rendaMensal * PERCENTUAL_RENDA_MAXIMO;
 
     // Obtém a estratégia de amortização apropriada
     const strategy = AmortizacaoFactory.getStrategy(sistema);
     const resultado = strategy.calcular(valorFinanciado, taxaJurosMensal, prazoMeses);
-
-    // Verifica se a parcela está dentro da capacidade de pagamento
-    const dentroCapacidade = resultado.primeiraParcela <= capacidadePagamento;
 
     return {
       valorImovel,
@@ -74,8 +69,8 @@ export class FinanciamentoService {
       totalPago: resultado.totalPago,
       sistema,
       indexador,
-      capacidadePagamento,
-      dentroCapacidade
+      capacidadePagamento: 0,
+      dentroCapacidade: true
     };
   }
 } 
