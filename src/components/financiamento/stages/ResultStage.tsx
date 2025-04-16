@@ -20,7 +20,9 @@ const ResultStage = ({
   stepperSteps,
   currentStep
 }: ResultStageProps) => {
-  const { resultado, entrada, rendaMensal } = useFinanciamento();
+  const { resultado, entrada, rendaMensal, selectedVariacao } = useFinanciamento();
+
+  const variacaoAtual = selectedVariacao || apartamento.variacoes[0];
 
   if (!resultado) return null;
 
@@ -34,6 +36,7 @@ const ResultStage = ({
         <ApartamentoCard 
           apartamento={apartamento}
           showSimulateButton={false}
+          selectedVariacao={selectedVariacao}
           className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden w-full"
         />
       </div>
@@ -41,7 +44,7 @@ const ResultStage = ({
       <div className="mb-8 md:mb-10">
         <FinanciamentoResultado 
           resultado={resultado}
-          valorImovel={apartamento.valor}
+          valorImovel={variacaoAtual.valor}
           entrada={Number(entrada) / 100}
           rendaMensal={Number(rendaMensal) / 100}
         />

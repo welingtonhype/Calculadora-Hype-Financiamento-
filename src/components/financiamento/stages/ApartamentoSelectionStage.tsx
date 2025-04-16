@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Stepper } from '@/components/ui/stepper';
-import { Apartamento } from '@/types/apartamento';
+import { Apartamento, ApartamentoVariacao } from '@/types/apartamento';
 import ApartamentoCard from '@/components/ApartamentoCard';
 import { Building2 } from 'lucide-react';
+import { useFinanciamento } from '../core/FinanciamentoContext';
 
 interface ApartamentoSelectionStageProps {
   apartamentos: Apartamento[];
@@ -17,6 +18,24 @@ const ApartamentoSelectionStage = ({
   stepperSteps,
   currentStep
 }: ApartamentoSelectionStageProps) => {
+  const { selectedApartamentoId, selectedVariacao, dispatch } = useFinanciamento();
+
+  const handleSelectVariacao = (apartamentoId: string, variacao: ApartamentoVariacao) => {
+    // Primeiro atualiza a variação selecionada
+    dispatch({ type: 'SELECT_VARIACAO', payload: variacao });
+    
+    // Se o apartamento mudou, então atualiza o apartamento selecionado
+    if (selectedApartamentoId !== apartamentoId) {
+      dispatch({ 
+        type: 'SELECT_APARTAMENTO', 
+        payload: { 
+          id: apartamentoId, 
+          variacao 
+        } 
+      });
+    }
+  };
+
   return (
     <div className="w-full max-w-[1200px] mx-auto animate-fade-in">
       <div className="mb-8 md:mb-10">
@@ -39,7 +58,9 @@ const ApartamentoSelectionStage = ({
             <div key={apartamento.id} className="w-full">
               <ApartamentoCard
                 apartamento={apartamento}
-                onSelect={() => onSelectApartamento(apartamento.id)}
+                onSelect={(variacao) => handleSelectVariacao(apartamento.id, variacao)}
+                selected={selectedApartamentoId === apartamento.id}
+                selectedVariacao={selectedApartamentoId === apartamento.id ? selectedVariacao : null}
                 className="w-full h-full"
               />
             </div>

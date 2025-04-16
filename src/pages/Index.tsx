@@ -19,24 +19,49 @@ const Index = () => {
         
         const { data, error } = await supabase
           .from('apartamentos')
-          .select('id, nome, metragem, quartos, valor, url, bairro, imagem_url')
+          .select('id, nome, metragem, quartos, valor, url, bairro, imagem_url, modelo')
           .order('valor', { ascending: true });
           
         if (error) {
           throw error;
         }
         
-        // Transform data to match our Apartamento interface
-        const transformedData: Apartamento[] = data.map(item => ({
-          id: item.id, // Keep the UUID as is
-          nome: item.nome,
-          metragem: item.metragem,
-          quartos: item.quartos,
-          valor: item.valor,
-          url: item.url,
-          bairro: item.bairro,
-          imagem: item.imagem_url
-        }));
+        // Agrupar apartamentos por modelo
+        const apartamentosPorModelo = data.reduce((acc, item) => {
+          const modelo = item.modelo || item.nome; // Se não tiver modelo, usa o nome como modelo
+          
+          if (!acc[modelo]) {
+            acc[modelo] = {
+              id: item.id,
+              nome: modelo,
+              bairro: item.bairro,
+              imagem: item.imagem_url,
+              variacoes: []
+            };
+          }
+          
+          acc[modelo].variacoes.push({
+            id: item.id,
+            metragem: item.metragem,
+            quartos: item.quartos,
+            valor: item.valor,
+            url: item.url
+          });
+          
+          return acc;
+        }, {});
+        
+        // Transformar em array e ordenar por valor
+        const transformedData: Apartamento[] = Object.values(apartamentosPorModelo)
+          .map((modelo: any) => ({
+            ...modelo,
+            // Campos para compatibilidade com código existente
+            metragem: modelo.variacoes[0].metragem,
+            quartos: modelo.variacoes[0].quartos,
+            valor: modelo.variacoes[0].valor,
+            url: modelo.variacoes[0].url
+          }))
+          .sort((a, b) => a.variacoes[0].valor - b.variacoes[0].valor);
         
         setApartamentos(transformedData);
       } catch (error) {
@@ -115,7 +140,7 @@ const Index = () => {
       <div className="min-h-screen bg-[#f9f9fa] flex flex-col">
         <Header />
         
-        <main className="flex-1 mt-8 md:mt-12 pt-8 md:pt-12 container mx-auto max-w-[1200px] px-4 md:px-8">
+        <main className="flex-1 container mx-auto max-w-[1200px] px-4 md:px-8 py-8 md:py-12">
           <div className="w-full max-w-2xl mx-auto space-y-6 px-4 md:px-0">
             <div className="text-left space-y-1.5 md:space-y-2">
               <h1 className="text-2xl md:text-3xl font-semibold text-hype-black">
@@ -138,7 +163,7 @@ const Index = () => {
                 </p>
               </div>
             ) : (
-              <div className="mb-16">
+              <div className="mb-8">
                 <FinanciamentoForm 
                   apartamentos={apartamentos}
                   isLoading={isLoading}
@@ -148,16 +173,10 @@ const Index = () => {
           </div>
         </main>
         
-        <div className="mt-16 md:mt-24"></div>
-        
-        <footer className="mt-auto py-4 md:py-6 bg-[#020817]">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col items-center space-y-1">
-              <p className="text-[11px] md:text-xs text-gray-400">© {new Date().getFullYear()} Simulador Hype – Financiamento Imobiliário</p>
-              <p className="text-[11px] md:text-xs text-gray-400 flex items-center gap-1">
-                Desenvolvido com <span className="text-red-500">❤️</span> pela equipe Hype
-              </p>
-            </div>
+        <footer className="py-4 bg-[#020817] border-t border-gray-800 mt-auto">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-[11px] md:text-xs text-gray-400">© {new Date().getFullYear()} Simulador Hype – Financiamento Imobiliário</p>
+            <p className="mt-1 text-[11px] md:text-xs text-gray-400">Desenvolvido com ❤️ pela equipe Hype</p>
           </div>
         </footer>
       </div>

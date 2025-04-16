@@ -30,13 +30,21 @@ const FinanciamentoForm = ({ apartamentos, isLoading }: FinanciamentoFormProps) 
     : null;
 
   const handleSelectApartamento = (id: string) => {
-    dispatch({ type: 'SELECT_APARTAMENTO', payload: id });
+    const apartamento = apartamentos.find(ap => ap.id === id);
+    if (apartamento) {
+      dispatch({ 
+        type: 'SELECT_APARTAMENTO', 
+        payload: { 
+          id, 
+          variacao: apartamento.variacoes[0] 
+        } 
+      });
+    }
   };
 
   const handleVoltar = () => {
     switch (formStage) {
       case FormStage.FINANCIAL_DATA:
-        dispatch({ type: 'SELECT_APARTAMENTO', payload: null });
         dispatch({ type: 'SET_STAGE', payload: FormStage.SELECT_PROPERTY });
         break;
       case FormStage.LEAD_FORM:

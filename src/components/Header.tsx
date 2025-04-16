@@ -13,12 +13,15 @@ const Header = () => {
           />
         </div>
         
-        <button 
+        <a 
+          href="https://api.whatsapp.com/send?phone=554187736892&text=Ol%C3%A1,%20tudo%20bem?"
+          target="_blank"
+          rel="noopener noreferrer"
           className="bg-[#00C896] hover:bg-[#00C896]/90 text-white px-3 md:px-4 py-2 rounded-lg h-9 md:h-10 transition-all duration-200 hover:shadow-md flex items-center gap-1.5 md:gap-2 text-sm md:text-base"
         >
           <MessageSquare className="h-3.5 w-3.5 md:h-4 md:w-4" />
           <span className="font-medium">Fale conosco</span>
-        </button>
+        </a>
       </div>
     </header>
   );

@@ -116,14 +116,16 @@ const FinanciamentoResultado = ({
 
       {/* Botão CTA */}
       <div className="px-4 md:px-0 mt-6 md:mt-8">
-        <button
+        <a
+          href="https://api.whatsapp.com/send?phone=554187736892&text=Ol%C3%A1,%20tudo%20bem?"
+          target="_blank"
+          rel="noopener noreferrer"
           className="w-full bg-hype-green text-white text-sm md:text-base font-semibold px-4 md:px-8 py-4 md:py-5 rounded-lg hover:bg-hype-green/90 transition-all flex items-center justify-center gap-1.5 md:gap-2"
-          onClick={onQueroEsteImovel}
           aria-label="Falar com um especialista"
         >
           <PhoneCall className="w-4 md:w-5 h-4 md:h-5" aria-hidden="true" />
           Falar com um especialista
-        </button>
+        </a>
 
         {/* Rodapé */}
         <p className="text-sm text-hype-gray-dark mt-4 md:mt-6">

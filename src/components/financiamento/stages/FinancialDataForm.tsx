@@ -1,14 +1,15 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Wallet, PiggyBank, Calculator } from 'lucide-react';
+import { ArrowLeft, Wallet, PiggyBank, Calculator, Building2 } from 'lucide-react';
 import { Stepper } from '@/components/ui/stepper';
 import AmortizationSwitch from '@/components/ui/amortization-switch';
 import { Input } from '@/components/ui/input';
 import { formatCurrency } from '@/utils/formatters';
-import { Apartamento } from '@/types/apartamento';
+import { Apartamento, ApartamentoVariacao } from '@/types/apartamento';
 import { useFinanciamento } from '../core/FinanciamentoContext';
 import { useFinanciamentoCalculator } from '../hooks/useFinanciamentoCalculator';
 import ApartamentoCard from '@/components/ApartamentoCard';
+import { FormStage } from '../core/FinanciamentoContext';
 
 interface FinancialDataFormProps {
   apartamento: Apartamento;
@@ -27,14 +28,28 @@ const FinancialDataForm = ({
     rendaMensal, 
     entrada, 
     amortizationSystem,
+    selectedVariacao,
     error,
     dispatch 
   } = useFinanciamento();
 
   const { handleNumberInput, calcularFinanciamento } = useFinanciamentoCalculator();
 
+  const handleSelectVariacao = (variacao: ApartamentoVariacao) => {
+    dispatch({ type: 'SELECT_VARIACAO', payload: variacao });
+  };
+
+  const handleVoltar = () => {
+    dispatch({ type: 'SET_STAGE', payload: FormStage.SELECT_PROPERTY });
+    if (onVoltar) {
+      onVoltar();
+    }
+  };
+
   const handleCalcular = () => {
-    calcularFinanciamento(apartamento);
+    if (selectedVariacao) {
+      calcularFinanciamento(selectedVariacao);
+    }
   };
 
   return (
@@ -43,12 +58,31 @@ const FinancialDataForm = ({
         <Stepper steps={stepperSteps} currentStep={currentStep} />
       </div>
 
-      <div className="w-full mb-6 md:mb-10">
-        <ApartamentoCard 
-          apartamento={apartamento}
-          showSimulateButton={false}
-          className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden w-full"
-        />
+      <div className="w-full mb-3 md:mb-6">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-hype-green" />
+              <h2 className="text-lg font-semibold text-hype-black">Imóvel selecionado</h2>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleVoltar}
+              className="text-xs border-gray-200 hover:bg-gray-50"
+            >
+              Trocar imóvel
+            </Button>
+          </div>
+
+          <ApartamentoCard 
+            apartamento={apartamento}
+            showSimulateButton={false}
+            selectedVariacao={selectedVariacao}
+            onSelect={handleSelectVariacao}
+            className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden w-full"
+          />
+        </div>
       </div>
 
       <div className="bg-white p-5 md:p-8 rounded-xl shadow-sm md:shadow-md">
@@ -108,15 +142,6 @@ const FinancialDataForm = ({
             className="w-full bg-hype-green hover:bg-hype-green/90 text-white py-4 md:py-5 text-sm md:text-base font-medium transition-colors duration-200 rounded-lg"
           >
             Calcular financiamento
-          </Button>
-
-          <Button 
-            onClick={onVoltar}
-            variant="outline"
-            className="w-full flex items-center justify-center gap-1.5 md:gap-2 py-4 md:py-5 text-sm md:text-base font-medium border-gray-200 hover:bg-gray-50 transition-colors duration-200 rounded-lg"
-          >
-            <ArrowLeft className="h-3.5 md:h-4 w-3.5 md:w-4" />
-            Voltar
           </Button>
         </div>
       </div>

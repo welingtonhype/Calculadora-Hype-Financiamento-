@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { Apartamento } from '@/types/apartamento';
+import { Apartamento, ApartamentoVariacao } from '@/types/apartamento';
 import { SistemaAmortizacao, ResultadoFinanciamento } from '@/utils/financiamento';
 import { CheckCircle, XCircle, Info } from 'lucide-react';
 
@@ -14,6 +14,7 @@ export enum FormStage {
 // Interface do estado
 interface FinanciamentoState {
   selectedApartamentoId: string | null;
+  selectedVariacao: ApartamentoVariacao | null;
   rendaMensal: string;
   entrada: string;
   formStage: FormStage;
@@ -25,7 +26,8 @@ interface FinanciamentoState {
 
 // Tipos de ações
 type FinanciamentoAction =
-  | { type: 'SELECT_APARTAMENTO'; payload: string }
+  | { type: 'SELECT_APARTAMENTO'; payload: { id: string; variacao: ApartamentoVariacao } }
+  | { type: 'SELECT_VARIACAO'; payload: ApartamentoVariacao }
   | { type: 'SET_RENDA_MENSAL'; payload: string }
   | { type: 'SET_ENTRADA'; payload: string }
   | { type: 'SET_STAGE'; payload: FormStage }
@@ -38,6 +40,7 @@ type FinanciamentoAction =
 // Estado inicial
 const initialState: FinanciamentoState = {
   selectedApartamentoId: null,
+  selectedVariacao: null,
   rendaMensal: '',
   entrada: '',
   formStage: FormStage.SELECT_PROPERTY,
@@ -53,14 +56,26 @@ function financiamentoReducer(state: FinanciamentoState, action: FinanciamentoAc
     case 'SELECT_APARTAMENTO':
       return {
         ...state,
-        selectedApartamentoId: action.payload,
+        selectedApartamentoId: action.payload.id,
+        selectedVariacao: action.payload.variacao,
         formStage: FormStage.FINANCIAL_DATA
+      };
+    case 'SELECT_VARIACAO':
+      return {
+        ...state,
+        selectedVariacao: action.payload
       };
     case 'SET_RENDA_MENSAL':
       return { ...state, rendaMensal: action.payload };
     case 'SET_ENTRADA':
       return { ...state, entrada: action.payload };
     case 'SET_STAGE':
+      if (action.payload === FormStage.SELECT_PROPERTY) {
+        return {
+          ...initialState,
+          formPreenchido: state.formPreenchido
+        };
+      }
       return { ...state, formStage: action.payload };
     case 'SET_AMORTIZATION_SYSTEM':
       return { ...state, amortizationSystem: action.payload };

@@ -27,8 +27,11 @@ const LeadFormStage = ({
     rendaMensal,
     entrada,
     amortizationSystem,
-    formPreenchido
+    formPreenchido,
+    selectedVariacao
   } = useFinanciamento();
+
+  const variacaoAtual = selectedVariacao || apartamento.variacoes[0];
 
   // Se já preencheu o formulário antes, pula direto para o resultado
   React.useEffect(() => {
@@ -40,14 +43,17 @@ const LeadFormStage = ({
   if (!resultado || !formPreenchido) return (
     <div className="w-full max-w-2xl mx-auto animate-fade-in space-y-6 md:space-y-8 px-4 md:px-0">
       <div className="pt-4 pb-6 md:pt-6 md:pb-10">
-        <Stepper steps={stepperSteps} currentStep={currentStep} />
+        <Stepper steps={stepperSteps} currentStep={currentStep} className="w-full" />
       </div>
       
-      <ApartamentoCard 
-        apartamento={apartamento}
-        showSimulateButton={false}
-        className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden w-full"
-      />
+      <div className="mb-8 md:mb-10">
+        <ApartamentoCard 
+          apartamento={apartamento}
+          showSimulateButton={false}
+          selectedVariacao={selectedVariacao}
+          className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-xl overflow-hidden w-full"
+        />
+      </div>
       
       <LeadForm 
         apartamento={apartamento}
