@@ -1,0 +1,35 @@
+# A project ID is a unique identifier for your project
+project_id = "ynfkbnxvnsueeuxpuscm"
+
+[api]
+# Porta para a API do Supabase
+port = 54321
+# Configurações de CORS
+cors_enabled = true
+cors_origins = ["*"]
+
+[db]
+# Porta para o banco de dados PostgreSQL
+port = 54322
+# Configurações de conexão
+max_connections = 100
+pool_mode = "transaction"
+
+[studio]
+# Porta para o Studio do Supabase
+port = 54323
+
+[auth]
+# Configurações de autenticação
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["https://localhost:3000"]
+jwt_expiry = 3600
+enable_signup = true
+
+[storage]
+# Configurações de armazenamento
+file_size_limit = "50MiB"
+
+[realtime]
+# Configurações do Realtime
+enabled = true

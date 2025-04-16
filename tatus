@@ -1,0 +1,5 @@
+[33m68f0485[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m feat: reorganiza componentes e ajusta layout
+[33md652de2[m feat: reorganiza estrutura dos componentes de financiamento
+[33mea2f20b[m Correção de Erro Financiamento
+[33mee12671[m Correção dos Inputs de Texto
+[33med37c85[m fix: Corrige validação dos inputs de valores no formulário de financiamento - Ajusta tratamento de valores monetários e validações
